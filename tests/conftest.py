@@ -10,7 +10,15 @@ from fastapi.testclient import TestClient
 @pytest.fixture
 def api_url():
     return ("http://localhost:8000/api/v1")
-@pytest.fixture
+
+@pytest.fixture(scope="session")
+def test_engine():
+    engine = create_engine("sqlite://:memory:")
+    Base.metadata.create_all(engine)
+    yield engine
+    engine.dispose()
+
+@pytest.fixture(scope="function")
 def client(db_session):
     from fastapi.testclient import TestClient
     from app.main import app
@@ -27,7 +35,8 @@ def client(db_session):
     test_client.close()
     # Cleanup
     app.dependency_overrides.clear()
-@pytest.fixture
+
+@pytest.fixture(scope="function")
 def db_session():
     engine = create_engine("sqlite:///:memory:")
     # engine dit ou est la DB, ici sur memoire ram, pour les tests
