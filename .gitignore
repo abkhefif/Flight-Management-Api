@@ -8,17 +8,6 @@ venv/
 env/
 ENV/
 
-# Environment variables (CRITICAL!)
-.env
-.env.local
-.env.production
-
-# Docker volumes
-postgres_data/
-
-# Windows/WSL files
-*.Zone.Identifier
-
 # Database
 *.db
 *.sqlite3
@@ -41,11 +30,7 @@ Thumbs.db
 
 .env
 .env.local
-.env.production
 
-# Docker volumes
+# PostgreSQL data (from docker-compose)
 postgres_data/
-
-# Windows/WSL files
-*.Zone.Identifier
 
