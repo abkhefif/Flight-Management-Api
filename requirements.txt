@@ -1,9 +1,3 @@
-#Framework Web
-fastapi == 0.104.1
-
-#fastAPI = framework pour creer des API REST
-# == 0.104.1 = version exact (pour eviter les surprises)
-
 uvicorn[standard]==0.24.0
 #uvicorn = server ASGI pour faire tourner fastAPI
 #[standard] = inclut les dependances optionnel
