@@ -8,6 +8,17 @@ venv/
 env/
 ENV/
 
+# Environment variables (CRITICAL!)
+.env
+.env.local
+.env.production
+
+# Docker volumes
+postgres_data/
+
+# Windows/WSL files
+*.Zone.Identifier
+
 # Database
 *.db
 *.sqlite3
@@ -27,3 +38,14 @@ htmlcov/
 # OS
 .DS_Store
 Thumbs.db
+
+.env
+.env.local
+.env.production
+
+# Docker volumes
+postgres_data/
+
+# Windows/WSL files
+*.Zone.Identifier
+
