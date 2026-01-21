@@ -4,6 +4,7 @@ from sqlalchemy import create_engine
 from app.core.database import SessionLocal
 from sqlalchemy.orm import sessionmaker
 from app.core.database import Base
+from fastapi.testclient import TestClient
 
 #fixture = Fonction qui prepare des donnees reutilisables
 @pytest.fixture
