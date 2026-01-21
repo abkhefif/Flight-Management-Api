@@ -1,4 +1,10 @@
 import pytest
+import sys
+from pathlib import Path
+
+# FORCER le PYTHONPATH (au cas où)
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from fastapi.testclient import TestClient
@@ -7,40 +13,43 @@ from fastapi.testclient import TestClient
 def api_url():
     return "http://localhost:8000/api/v1"
 
-@pytest.fixture(scope="session")
-def test_engine():
-    """Crée un engine SQLite en mémoire pour tous les tests"""
-    # IMPORTANT: Importer Base et TOUS les modèles AVANT create_all
-    from app.core.database import Base
-    from app.models.airport import Airport
-    from app.models.runway import Runway
-    from app.models.gate import Gate
-    from app.models.flight import Flight
-    from app.models.slot import Slot
-    
-    engine = create_engine("sqlite:///:memory:")
-    Base.metadata.create_all(engine)
-    yield engine
-    engine.dispose()
-
 @pytest.fixture(scope="function")
-def db_session(test_engine):
-    """Crée une nouvelle session DB pour chaque test avec rollback automatique"""
-    connection = test_engine.connect()
-    transaction = connection.begin()
+def db_session():
+    """Recrée la DB pour CHAQUE test - 100% isolé"""
+    # Import TOUS les modèles explicitement
+    from app.core.database import Base
+    import app.models.airport
+    import app.models.runway
+    import app.models.gate
+    import app.models.flight
+    import app.models.slot
     
-    SessionLocal = sessionmaker(bind=connection)
-    session = SessionLocal()
+    # Créer engine SQLITE en mémoire
+    engine = create_engine(
+        "sqlite:///:memory:",
+        connect_args={"check_same_thread": False}
+    )
+    
+    # Créer TOUTES les tables
+    Base.metadata.create_all(bind=engine)
+    
+    # Créer session
+    TestingSessionLocal = sessionmaker(
+        autocommit=False,
+        autoflush=False,
+        bind=engine
+    )
+    session = TestingSessionLocal()
     
     yield session
     
+    # Cleanup
     session.close()
-    transaction.rollback()
-    connection.close()
+    engine.dispose()
 
 @pytest.fixture(scope="function")
 def client(db_session):
-    """Crée un TestClient FastAPI avec override de la DB"""
+    """Client FastAPI avec DB override"""
     from app.main import app
     from app.core.database import get_db
     
@@ -50,10 +59,12 @@ def client(db_session):
         finally:
             pass
     
+    # Override la dépendance
     app.dependency_overrides[get_db] = override_get_db
     
-    test_client = TestClient(app)
-    yield test_client
-    test_client.close()
+    # Créer le client
+    with TestClient(app) as test_client:
+        yield test_client
     
+    # Cleanup
     app.dependency_overrides.clear()
