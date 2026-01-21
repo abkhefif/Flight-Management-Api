@@ -34,3 +34,11 @@ Thumbs.db
 # PostgreSQL data (from docker-compose)
 postgres_data/
 
+*:Zone.Identifier
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+fms.db
+app.db
