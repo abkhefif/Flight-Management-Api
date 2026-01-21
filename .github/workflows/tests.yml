@@ -23,6 +23,17 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     
+    - namename: Debug environment
+      run: |
+        echo "=== Working directory ==="
+        pwd
+        echo "=== Project structure ==="
+        ls -la
+        echo "=== Test files found ==="
+        find tests -name "test_*.py"
+        echo "=== Pytest configuration ==="
+        cat pytest.ini
+
     - name: Run tests with pytest
       run: |
         pytest tests/ -v --cov=app --cov-report=term-missing
