@@ -1,0 +1,28 @@
+#Framework Web
+fastapi == 0.104.1
+
+#fastAPI = framework pour creer des API REST
+# == 0.104.1 = version exact (pour eviter les surprises)
+
+uvicorn[standard]==0.24.0
+#uvicorn = server ASGI pour faire tourner fastAPI
+#[standard] = inclut les dependances optionnel
+
+#base de donnees
+sqlalchemy==2.0.23
+#sqlalchemy = orm (traduit python <-> sql)
+
+alembic==1.12.1
+#alembic = gestion des migration de DB
+#permet de modifier la structure de la DB sans perdres les datas
+
+#validation des donnees
+pydantic==2.5.0
+#pydantic = validation auto des des datas
+#si envois {"age": "abc"} au lieu de {"age":25}, pydantic dit non
+
+pydantic-settings==2.1.0
+#extenstion de pydantic pour lire les variables d'env
+
+python-dotenv==1.0.0
+#charge les var depuis le fichier .env
