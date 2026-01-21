@@ -28,6 +28,7 @@ python-dotenv==1.0.0
 #charge les var depuis le fichier .env
 
 #testing
+httpx
 requests
 pytest
 pytest-cov
