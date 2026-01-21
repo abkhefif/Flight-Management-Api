@@ -26,3 +26,6 @@ pydantic-settings==2.1.0
 
 python-dotenv==1.0.0
 #charge les var depuis le fichier .env
+
+pytest
+pytest-cov
