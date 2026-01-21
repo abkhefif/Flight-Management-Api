@@ -25,4 +25,4 @@ jobs:
     
     - name: Run tests with pytest
       run: |
-        pytest -v --cov=app --cov-report=term-missing
+        pytest tests/ -v --cov=app --cov-report=term-missing
