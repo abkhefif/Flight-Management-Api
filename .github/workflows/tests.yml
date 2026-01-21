@@ -23,7 +23,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     
-    - namename: Debug environment
+    - name: Debug environment
       run: |
         echo "=== Working directory ==="
         pwd
