@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from uuid import UUID
-from app.core.database import SessionLocal
+from app.core.database import get_db
 from app.schemas.slot import SlotRead, SlotCreate, SlotUpdate
 from app.models.slot import Slot
 

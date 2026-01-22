@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from app.services.flight_service import FlightService
-from app.core.database import SessionLocal
+from app.core.database import det_db
 from app.schemas.flight import FlightRead, FlightCreate, FlightUpdate
 from app.models.flight import Flight
 from uuid import UUID
