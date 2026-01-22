@@ -1,42 +1,101 @@
+"""
+Configuration de test pour Flight Management System
+Utilise une base de données SQLite en mémoire isolée pour chaque test.
+"""
 import pytest
-from sqlalchemy import create_engine
-from app.core.database import SessionLocal
-from sqlalchemy.orm import sessionmaker
-from app.core.database import Base
-from sqlalchemy.pool import StaticPool
+import os
+import sys
+from pathlib import Path
 
-#fixture = Fonction qui prepare des donnees reutilisables
+# Ajouter le chemin racine
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
+from fastapi.testclient import TestClient
+
+
 @pytest.fixture
 def api_url():
-    return ("http://localhost:8000/api/v1")
-@pytest.fixture
-def client(db_session):
-    from fastapi.testclient import TestClient
-    from app.main import app
-    from app.core.database import get_db
-    def override_get_db():
-        try:
-            yield db_session
-        finally:
-            pass
-    app.dependency_overrides[get_db] = override_get_db
-    # Créer le client (sans context manager)
-    test_client = TestClient(app)
-    yield test_client
-    test_client.close()
-    # Cleanup
-    app.dependency_overrides.clear()
-@pytest.fixture
-def db_session():
-    engine = create_engine(
+    """URL de base pour l'API"""
+    return "/api/v1"
+
+
+@pytest.fixture(scope="function")
+def client():
+    """
+    Client FastAPI avec DB SQLite en mémoire.
+    Chaque test obtient une DB fraîche et isolée.
+    """
+    # Créer un engine SQLite en mémoire avec StaticPool pour partager la connexion
+    # entre les threads (nécessaire pour FastAPI + SQLite en mémoire)
+    test_engine = create_engine(
         "sqlite:///:memory:",
         connect_args={"check_same_thread": False},
-        poolclass=StaticPool  # ← CRITIQUE
+        poolclass=StaticPool,  # Crucial pour SQLite en mémoire avec FastAPI
     )
-    # engine dit ou est la DB, ici sur memoire ram, pour les tests
-    Base.metadata.create_all(engine)
-    SessionLocal = sessionmaker(bind=engine)
-    # build les tables necessaire (airports,runways, etc..)
-    session = SessionLocal()
+    
+    TestingSessionLocal = sessionmaker(
+        autocommit=False,
+        autoflush=False,
+        bind=test_engine
+    )
+    
+    # Importer Base et les modèles pour créer les tables
+    from app.core.database import Base
+    from app.models import Airport, Runway, Gate, Flight, Slot
+    
+    # Créer toutes les tables dans la DB de test
+    Base.metadata.create_all(bind=test_engine)
+    
+    # Importer l'app et la fonction get_db
+    from app.main import app
+    from app.core.database import get_db
+    
+    # Fonction override pour injecter notre session de test
+    def override_get_db():
+        db = TestingSessionLocal()
+        try:
+            yield db
+        finally:
+            db.close()
+    
+    # Appliquer l'override
+    app.dependency_overrides[get_db] = override_get_db
+    
+    # Créer et retourner le client de test
+    with TestClient(app) as test_client:
+        yield test_client
+    
+    # Cleanup après le test
+    app.dependency_overrides.clear()
+    Base.metadata.drop_all(bind=test_engine)
+    test_engine.dispose()
+
+
+@pytest.fixture(scope="function")
+def db_session():
+    """
+    Session de base de données pour tests directs sans FastAPI.
+    Utile pour tester les modèles et services directement.
+    """
+    from app.core.database import Base
+    from app.models import Airport, Runway, Gate, Flight, Slot
+    
+    test_engine = create_engine(
+        "sqlite:///:memory:",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    
+    Base.metadata.create_all(bind=test_engine)
+    
+    TestingSessionLocal = sessionmaker(bind=test_engine)
+    session = TestingSessionLocal()
+    
     yield session
+    
     session.close()
+    Base.metadata.drop_all(bind=test_engine)
+    test_engine.dispose()
