@@ -1,3 +1,7 @@
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+from typing import List
+
 from app.core.database import SessionLocal
 from app.schemas.airport import AirportRead
 from app.models.airport import Airport
@@ -15,6 +19,7 @@ from app.models.runway import Runway
 from app.models.gate import Gate
 from app.models.slot import Slot
 from app.models.flight import Flight
+from fastapi import FastAPI
 
 from app.api.v1.routes.airports import router as airports_router
 from app.api.v1.routes.runways import router as runways_router

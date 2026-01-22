@@ -8,7 +8,6 @@ from app.models.airport import Airport
 
 router = APIRouter()
 
-# Dependency
 def get_db():
     db = SessionLocal()
     try:
