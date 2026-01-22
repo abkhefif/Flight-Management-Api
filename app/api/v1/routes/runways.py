@@ -8,12 +8,12 @@ from app.models.runway import Runway
 
 router = APIRouter()
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+#def get_db():
+ #   db = SessionLocal()
+  #  try:
+   #     yield db
+    #finally:
+     #   db.close()
 
 #GET ALL
 @router.get("", response_model = List[RunwayRead])

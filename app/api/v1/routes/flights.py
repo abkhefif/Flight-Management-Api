@@ -2,19 +2,19 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from app.services.flight_service import FlightService
-from app.core.database import det_db
+from app.core.database import get_db
 from app.schemas.flight import FlightRead, FlightCreate, FlightUpdate
 from app.models.flight import Flight
 from uuid import UUID
 
 router = APIRouter()
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+#def get_db():
+ #   db = SessionLocal()
+  #  try:
+   #     yield db
+    #finally:
+     #   db.close()
 
 #GET ALL
 @router.get("", response_model = List[FlightRead])

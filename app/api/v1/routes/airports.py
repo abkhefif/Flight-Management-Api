@@ -8,12 +8,12 @@ from app.models.airport import Airport
 
 router = APIRouter()
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+#def get_db():
+ #   db = get_db()
+  #  try:
+   #     yield db
+    #finally:
+     #   db.close()
 
 # 1. GET ALL
 @router.get("", response_model=List[AirportRead])
