@@ -1,5 +1,4 @@
 import pytest
-import requests
 from sqlalchemy import create_engine
 from app.core.database import SessionLocal
 from sqlalchemy.orm import sessionmaker
