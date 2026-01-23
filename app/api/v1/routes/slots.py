@@ -8,13 +8,6 @@ from app.models.slot import Slot
 
 router = APIRouter()
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
 #GET ALL
 @router.get("", response_model = List[SlotRead])
 def get_slots(db:Session = Depends(get_db)):

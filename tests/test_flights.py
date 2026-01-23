@@ -364,3 +364,160 @@ def test_delete_flight_not_found(client, api_url):
     response = client.delete(f"{api_url}/airports/{fake_id}")
     assert response.status_code == 404
 
+def test_create_flight_departure_runway_conflict(client, api_url):
+    # airports
+    dep_airport = client.post(
+        f"{api_url}/airports",
+        json={
+            "code": f"DEP{str(uuid4())[:6]}",
+            "name": "Departure Airport",
+            "city": "City",
+            "country": "Country",
+            "timezone": "UTC"
+        }
+    ).json()["id"]
+
+    arr_airport = client.post(
+        f"{api_url}/airports",
+        json={
+            "code": f"ARR{str(uuid4())[:6]}",
+            "name": "Arrival Airport",
+            "city": "City",
+            "country": "Country",
+            "timezone": "UTC"
+        }
+    ).json()["id"]
+
+    # runway dispo
+    runway_id = client.post(
+        f"{api_url}/runways",
+        json={
+            "runway_code": "RWY_CONFLICT",
+            "length_meters": 3000,
+            "width_meters": 45,
+            "surface_type": "asphalt",
+            "status": "AVAILABLE",
+            "airport_id": dep_airport
+        }
+    ).json()["id"]
+
+    # slot EXISTANT qui crée le conflit
+    now = datetime.utcnow()
+    client.post(
+        f"{api_url}/slots",
+        json={
+            "slot_type": "DEPARTURE",
+            "airport_id": dep_airport,
+            "runway_id": runway_id,
+            "start_time": (now - timedelta(minutes=20)).isoformat(),
+            "end_time": (now + timedelta(minutes=20)).isoformat(),
+            "status": "ALLOCATED"
+        }
+    )
+
+    flight_data = {
+        "flight_number": "AF200",
+        "airline": "Air France",
+        "departure_airport_id": dep_airport,
+        "arrival_airport_id": arr_airport,
+        "scheduled_departure": now.isoformat(),
+        "scheduled_arrival": (now + timedelta(hours=2)).isoformat(),
+        "status": "scheduled"
+    }
+
+    response = client.post(f"{api_url}/flights", json=flight_data)
+
+    assert response.status_code == 409
+    assert "Runway conflict" in response.text
+
+
+def test_create_flight_no_departure_runway(client, api_url):
+    # airport départ
+    dep_airport = client.post(
+        f"{api_url}/airports",
+        json={
+            "code": f"DEP{str(uuid4())[:6]}",
+            "name": "Departure Airport",
+            "city": "City",
+            "country": "Country",
+            "timezone": "UTC"
+        }
+    ).json()["id"]
+
+    arr_airport = client.post(
+        f"{api_url}/airports",
+        json={
+            "code": f"ARR{str(uuid4())[:6]}",
+            "name": "Arrival Airport",
+            "city": "City",
+            "country": "Country",
+            "timezone": "UTC"
+        }
+    ).json()["id"]
+
+    flight_data = {
+        "flight_number": "AF100",
+        "airline": "Air France",
+        "departure_airport_id": dep_airport,
+        "arrival_airport_id": arr_airport,
+        "scheduled_departure": datetime.utcnow().isoformat(),
+        "scheduled_arrival": (datetime.utcnow() + timedelta(hours=2)).isoformat(),
+        "status": "scheduled"
+    }
+
+    response = client.post(f"{api_url}/flights", json=flight_data)
+
+    assert response.status_code == 400
+    assert "No runway available" in response.text
+
+def test_create_flight_no_arrival_runway(client, api_url):
+    dep_airport = client.post(
+        f"{api_url}/airports",
+        json={
+            "code": f"DEP{str(uuid4())[:6]}",
+            "name": "Departure Airport",
+            "city": "City",
+            "country": "Country",
+            "timezone": "UTC"
+        }
+    ).json()["id"]
+
+    arr_airport = client.post(
+        f"{api_url}/airports",
+        json={
+            "code": f"ARR{str(uuid4())[:6]}",
+            "name": "Arrival Airport",
+            "city": "City",
+            "country": "Country",
+            "timezone": "UTC"
+        }
+    ).json()["id"]
+
+    # runway UNIQUEMENT au départ
+    client.post(
+        f"{api_url}/runways",
+        json={
+            "runway_code": "RWY_DEP",
+            "length_meters": 3000,
+            "width_meters": 45,
+            "surface_type": "asphalt",
+            "status": "AVAILABLE",
+            "airport_id": dep_airport
+        }
+    )
+
+    flight_data = {
+        "flight_number": "AF300",
+        "airline": "Air France",
+        "departure_airport_id": dep_airport,
+        "arrival_airport_id": arr_airport,
+        "scheduled_departure": datetime.utcnow().isoformat(),
+        "scheduled_arrival": (datetime.utcnow() + timedelta(hours=2)).isoformat(),
+        "status": "scheduled"
+    }
+
+    response = client.post(f"{api_url}/flights", json=flight_data)
+
+    assert response.status_code == 400
+    assert "No runway available" in response.text
+
