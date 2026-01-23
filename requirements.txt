@@ -20,4 +20,4 @@ requests
 
 psycopg2-binary==2.9.9  # PostgreSQL
 gunicorn==21.2.0 #production server 
-slowappi==0.1.9
+slowapi==0.1.9
