@@ -9,13 +9,6 @@ from uuid import UUID
 
 router = APIRouter()
 
-#def get_db():
- #   db = SessionLocal()
-  #  try:
-   #     yield db
-    #finally:
-     #   db.close()
-
 #GET ALL
 @router.get("", response_model = List[FlightRead])
 def get_flights(db:Session = Depends(get_db)):
@@ -40,10 +33,10 @@ def  update_flight(id: str, flight_update: FlightUpdate, db: Session = Depends(g
     flight = db.query(Flight).filter(Flight.id == id).first()
     if not flight:
         raise HTTPException(status_code = 404, detail="Flight not found")
-    update_data = flight.update.dict(exclude_unset=True)
+    update_data = flight_update.dict(exclude_unset=True)
     for key, value in flight_update.dict(exclude_unset=True).items():
         if isinstance(value, UUID):
-            update_data[key] = str(value)
+            value = str(value)
         setattr(flight, key, value)
     db.commit()
     db.refresh(flight)
