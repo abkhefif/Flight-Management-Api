@@ -12,7 +12,7 @@ COPY alembic/ ./alembic/
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "python init_db.py && python seed_data.py && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
+CMD ["sh", "-c", "alembic upgrade head && python seed_data.py && uvicorn ..."]
 
 HEALTHCHECK --interval=30s --timeout=3s \
   CMD python -c "import requests; requests.get('http://localhost:8000/health')"
