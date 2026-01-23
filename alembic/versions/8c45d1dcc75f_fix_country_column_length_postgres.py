@@ -1,8 +1,8 @@
-"""fix country column length
+"""fix country column length postgres
 
-Revision ID: 863574756a86
+Revision ID: 8c45d1dcc75f
 Revises: 80fcb721b17f
-Create Date: 2026-01-23 23:06:00.397288
+Create Date: 2026-01-23 23:24:26.835550
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '863574756a86'
+revision: str = '8c45d1dcc75f'
 down_revision: Union[str, None] = '80fcb721b17f'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
