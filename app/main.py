@@ -11,6 +11,7 @@ from app.schemas.airport import AirportCreate
 from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from sqlalchemy.orm import Session
+from fastapi.openapi.docs import get_swagger_ui_html
 from typing import List
 from app.core.auth import verify_credentials
 
