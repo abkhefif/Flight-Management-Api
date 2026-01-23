@@ -8,16 +8,8 @@ from app.models.airport import Airport
 
 router = APIRouter()
 
-#def get_db():
- #   db = get_db()
-  #  try:
-   #     yield db
-    #finally:
-     #   db.close()
-
 # 1. GET ALL
 @router.get("", response_model=List[AirportRead])
-#           ^^ Pas /airports, juste "" (le prefix sera ajouté dans main.py)
 def get_airports(db: Session = Depends(get_db)):
     airports = db.query(Airport).all()
     return airports

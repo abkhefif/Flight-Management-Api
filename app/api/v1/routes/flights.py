@@ -36,7 +36,7 @@ def  update_flight(id: str, flight_update: FlightUpdate, db: Session = Depends(g
     update_data = flight_update.dict(exclude_unset=True)
     for key, value in flight_update.dict(exclude_unset=True).items():
         if isinstance(value, UUID):
-            value = str(value)
+            value = str(value) 
         setattr(flight, key, value)
     db.commit()
     db.refresh(flight)

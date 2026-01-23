@@ -8,13 +8,6 @@ from app.models.gate import Gate
 
 router = APIRouter()
 
-#def get_db():
- #   db = SessionLocal()
-  #  try:
-   #     yield db
-    #finally:
-     #   db.close()
-
 #GET ALL
 @router.get("", response_model = List[GateRead])
 def get_gates(db:Session = Depends(get_db)):

@@ -17,3 +17,7 @@ pytest-cov==7.0.0
 httpx==0.27.2
 anyio==4.6.0
 requests
+
+psycopg2-binary==2.9.9  # PostgreSQL
+gunicorn==21.2.0 #production server 
+slowappi==0.1.9
