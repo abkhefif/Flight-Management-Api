@@ -17,7 +17,7 @@ class Airport(Base):
     code = Column(String(4), unique=True, nullable=False, index=True)
     name = Column(String(255), nullable=False)
     city = Column(String(255), nullable=False)
-    country = Column(String(3), nullable=False)
+    country = Column(String(100), nullable=False)
     timezone = Column(String(50), nullable=False)
     created_at = Column(DateTime, nullable=False, default=func.now())
     updated_at = Column(DateTime, nullable=False, default=func.now(),onupdate=func.now()) 
